@@ -58,6 +58,12 @@ export class Sessions {
     this.byId.delete(piSessionId);
   }
 
+  endAll(): void {
+    for (const piSessionId of this.byId.keys()) {
+      this.end(piSessionId);
+    }
+  }
+
   cwd(piSessionId: string | undefined): string {
     return (
       (piSessionId === undefined

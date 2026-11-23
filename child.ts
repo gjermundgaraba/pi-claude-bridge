@@ -27,6 +27,8 @@ const CHILD_DEFAULTS = {
   CLAUDE_CODE_MAX_RETRIES: "15",
 } as const;
 
+const CLAUDE_OAUTH_TOKEN_PREFIX = "sk-ant-oat";
+
 const CHILD_ENV = {
   ENABLE_CLAUDEAI_MCP_SERVERS: "0",
   DISABLE_AUTO_COMPACT: "1",
@@ -42,6 +44,17 @@ export const childEnv = (gateway?: ChildGateway): NodeJS.ProcessEnv => {
 
   if (gateway?.baseUrl !== undefined) {
     env["ANTHROPIC_BASE_URL"] = gateway.baseUrl;
+  }
+
+  if (
+    gateway?.baseUrl === undefined &&
+    gateway?.authToken?.startsWith(CLAUDE_OAUTH_TOKEN_PREFIX) === true
+  ) {
+    env["CLAUDE_CODE_OAUTH_TOKEN"] = gateway.authToken;
+    delete env["ANTHROPIC_API_KEY"];
+    delete env["ANTHROPIC_AUTH_TOKEN"];
+
+    return env;
   }
 
   if (gateway?.authToken !== undefined) {

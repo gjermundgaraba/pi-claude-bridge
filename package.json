@@ -1,7 +1,6 @@
 {
   "name": "@gjermundgaraba/pi-claude-bridge",
   "version": "0.1.0",
-  "private": true,
   "description": "Uses Claude Code with your Claude subscription as a Pi model provider.",
   "keywords": [
     "pi-package"
@@ -16,34 +15,32 @@
     "url": "git+https://github.com/gjermundgaraba/pi-claude-bridge.git"
   },
   "files": [
-    "bash-timeout.ts",
-    "child.ts",
-    "content.ts",
+    "**/*.ts",
+    "!tests",
+    "!vite.config.ts",
+    "dist",
     "docs",
-    "index.ts",
-    "json.ts",
-    "log.ts",
-    "machine",
-    "mcp-server.ts",
-    "models.ts",
-    "prompt.ts",
-    "provider.ts",
-    "query",
-    "session",
-    "sessions.ts",
-    "sync.ts",
-    "text.ts",
-    "tools.ts",
-    "translate.ts",
-    "turn.ts",
-    "README.md",
-    "LICENSE",
     "LICENSE.pi-claude-bridge"
   ],
   "type": "module",
-  "exports": "./index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./host": "./host.ts"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": "./index.ts",
+      "./host": {
+        "types": "./dist/host.d.mts",
+        "default": "./dist/host.mjs"
+      }
+    },
+    "access": "public"
+  },
   "scripts": {
-    "prepare": "vp config && effect-tsgo patch --no-typescript --oxlint --tsrs"
+    "build": "vp pack",
+    "prepare": "vp config && effect-tsgo patch --no-typescript --oxlint --tsrs",
+    "prepublishOnly": "vp run build"
   },
   "dependencies": {
     "@anthropic-ai/claude-agent-sdk": "0.3.330",
@@ -69,6 +66,11 @@
     "@earendil-works/pi-ai": "*",
     "@earendil-works/pi-coding-agent": "*",
     "typebox": "*"
+  },
+  "peerDependenciesMeta": {
+    "@earendil-works/pi-coding-agent": {
+      "optional": true
+    }
   },
   "devEngines": {
     "packageManager": {

@@ -9,6 +9,10 @@ export default defineConfig({
     ...ultraciteFmt,
     ignorePatterns: [...(ultraciteFmt.ignorePatterns ?? []), "AGENTS.md"],
   },
+  pack: {
+    entry: { host: "host.ts" },
+    dts: { generator: "tsgo", tsconfig: "tsconfig.build.json" },
+  },
   lint: config({
     assertFunctions: ["expectPrefix", "inspect", "open"],
     overrides: [

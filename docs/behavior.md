@@ -6,9 +6,17 @@ It started as a port of [pi-claude-bridge](https://github.com/elidickinson/pi-cl
 
 ## Requirements
 
-- A working Claude Code login (`claude` signed in to a Pro or Max plan), or a configured Anthropic-compatible proxy/gateway in `models.json`. The Agent SDK bundles its own Claude Code binary.
+- A Claude Pro or Max login: Claude Code's own (`claude` signed in), a Claude account signed in with `/login claude-bridge`, or a configured Anthropic-compatible proxy/gateway in `models.json`. The Agent SDK bundles its own Claude Code binary.
 - Without a proxy configured in `models.json`, avoid exported `ANTHROPIC_BASE_URL`, `ANTHROPIC_API_KEY`, or `ANTHROPIC_AUTH_TOKEN` in pi's environment: Claude Code inherits them and turns fail with that gateway's auth error.
 - The npm `pi-claude-bridge` package must not be installed alongside this one; both register the `claude-bridge` provider.
+
+## Claude account login
+
+`/login claude-bridge` offers pi-ai's Claude Pro/Max OAuth next to a gateway token. A signed-in account's access token (`sk-ant-oat…`, refreshed by pi before it expires) reaches Claude Code as `CLAUDE_CODE_OAUTH_TOKEN`, with any inherited `ANTHROPIC_API_KEY` and `ANTHROPIC_AUTH_TOKEN` cleared, so each pi credential store runs on its own account rather than the machine's Claude Code login. With a gateway `baseUrl` configured, the token goes to the gateway as before.
+
+## Other hosts
+
+`createClaudeBridgeProvider()` from `@gjermundgaraba/pi-claude-bridge/host` returns the provider for a pi-ai `Models` outside pi's coding agent, such as a pi-durable Harness. The host's credential store decides whose login a request uses. There is no pi session file, so the bridge records no `claude-bridge-session` entries: Claude Code runs in the process's working directory, each pi session id keeps its Claude Code session for the life of the process, and a new process rebuilds it from the history it is sent. `cleanupSessionResources(sessionId)` from pi-ai ends that session's query, and calling it without an id ends them all. Each provider registers its own cleanup, so create one per credential store rather than per request.
 
 ## Proxy or gateway configuration
 
@@ -95,4 +103,6 @@ Facts about Claude Code, Agent SDK 0.3.316 (Claude Code 2.1.316), pi and XState 
 - Claude Code finishes writing its session file after its stdin closes; stopping it sooner can cut the file short.
 - Some models default to an omitted thinking display. The bridge passes the raw `thinking-display` flag because the typed option would force a thinking mode on every model.
 - Pi passes a session id on every agent turn, so a call without one is an extension's one-off. Compaction, branch and bug-report summaries carry `cacheRetention: "none"`.
+- pi's agent directory is `PI_CODING_AGENT_DIR` or `~/.pi/agent`. The bridge reads it itself rather than through pi-coding-agent's `getAgentDir()`, so `./host` loads without pi-coding-agent.
+- Pi's extension loader resolves only some pi-ai subpaths for an extension (`models`, `compat`, `oauth`, `providers/all`); any other, such as `providers/anthropic`, fails to load. The bridge takes Anthropic's OAuth from `builtinProviders()`.
 - XState freezes machine context while pi goes on writing to its own messages, so the conversation keeps copies.

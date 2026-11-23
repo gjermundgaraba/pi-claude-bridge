@@ -30,5 +30,8 @@ jobs:
       - run: vp install --frozen-lockfile
       - run: vp check
       - run: vp test
+      - run: vp pack
+      - name: Check that the host entry runs without pi's session packages
+        run: "! grep -rE 'pi-coding-agent|pi-tui' dist"
       - name: Check that the build left the tree clean
         run: git diff --exit-code
