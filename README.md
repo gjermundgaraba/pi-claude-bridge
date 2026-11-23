@@ -1,4 +1,4 @@
-# claude-bridge
+# pi-claude-bridge
 
 Uses Claude Code with your Claude subscription as a Pi model provider.
 
@@ -8,7 +8,7 @@ Uses Claude Code with your Claude subscription as a Pi model provider.
 
 ## Install
 
-Load `pi/extensions/experimental/claude-bridge/index.ts` as a local extension; npm installation is not supported.
+Clone this repository, run `vp install` in it, and add its directory to the `packages` in pi's `settings.json`; npm installation is not supported.
 
 ## Usage
 

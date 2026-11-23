@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from "vite-plus/test";
 
-import { patchEnv } from "../../../../tests/helpers/env.js";
 import { childEnv } from "../child.js";
+import { patchEnv } from "./support/env.js";
 
 describe("childEnv", () => {
   let restoreEnv: (() => void) | undefined;

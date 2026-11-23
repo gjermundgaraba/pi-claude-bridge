@@ -65,10 +65,10 @@ Plan usage reaches `after_provider_response` instead. Claude Code sends a `rate_
 
 ## Tests
 
-`vp test --project unit pi/extensions/experimental/claude-bridge` runs the offline suite. The live suite drives real Claude Code with your own login and spends subscription quota, so it only runs on request. pi stays isolated, but Claude Code writes its session files to your real `~/.claude/projects` (or `CLAUDE_CONFIG_DIR`); each test deletes its own afterwards:
+`vp test --project unit` runs the offline suite. The live suite drives real Claude Code with your own login and spends subscription quota, so it only runs on request. pi stays isolated, but Claude Code writes its session files to your real `~/.claude/projects` (or `CLAUDE_CONFIG_DIR`); each test deletes its own afterwards:
 
 ```bash
-CLAUDE_BRIDGE_LIVE=1 vp test --project integration pi/extensions/experimental/claude-bridge
+CLAUDE_BRIDGE_LIVE=1 vp test --project integration
 ```
 
 ## Upstream behavior the bridge relies on

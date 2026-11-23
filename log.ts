@@ -3,7 +3,7 @@ import path from "node:path";
 import { inspect } from "node:util";
 
 import type { Options } from "@anthropic-ai/claude-agent-sdk";
-import { getExtensionStoragePaths } from "@clanker-stuff/pi-extension-paths";
+import { getAgentDir } from "@earendil-works/pi-coding-agent";
 
 const EXTENSION_ID = "claude-bridge";
 
@@ -17,11 +17,7 @@ export const debugLogPath = (): string => {
 
   return override !== undefined && override !== ""
     ? override
-    : path.join(
-        getExtensionStoragePaths(EXTENSION_ID).dataDir,
-        "logs",
-        "debug.log"
-      );
+    : path.join(getAgentDir(), "data", EXTENSION_ID, "logs", "debug.log");
 };
 
 const formatInFull = (value: unknown): string =>

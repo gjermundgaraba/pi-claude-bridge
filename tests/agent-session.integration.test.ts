@@ -13,9 +13,6 @@ import {
   vi,
 } from "vite-plus/test";
 
-import { createAgentSessionHarness } from "../../../../tests/harness/agent-session.js";
-import { patchEnv } from "../../../../tests/helpers/env.js";
-import { createTempDir } from "../../../../tests/helpers/fs.js";
 import { createClaudeBridge } from "../index.js";
 import { SESSION_ENTRY } from "../session/warm.js";
 import {
@@ -32,6 +29,9 @@ import {
 } from "./fixtures/sdk.js";
 import { fakeQueryFunction } from "./helpers.js";
 import type { FakeQuery } from "./helpers.js";
+import { createAgentSessionHarness } from "./support/agent-session.js";
+import { patchEnv } from "./support/env.js";
+import { createTempDir } from "./support/fs.js";
 
 const answerAsCc1 = (query: FakeQuery, text: string): void => {
   query.push(init("cc-1"));

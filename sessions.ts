@@ -1,4 +1,3 @@
-import { safeText } from "@clanker-stuff/pi-tool-rendering/text";
 import type { Message } from "@earendil-works/pi-ai";
 import type { ExtensionUIContext } from "@earendil-works/pi-coding-agent";
 import { createActor, waitFor } from "xstate";
@@ -10,6 +9,7 @@ import { conversationMachine } from "./machine/conversation.js";
 import type { ConversationSnapshot } from "./machine/conversation.js";
 import { adoptable, sameRecord, sessionRecord } from "./session/warm.js";
 import type { Adoption, SessionRecord } from "./session/warm.js";
+import { safeText } from "./text.js";
 
 export type Conversation = Actor<typeof conversationMachine>;
 

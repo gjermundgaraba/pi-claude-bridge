@@ -2,7 +2,7 @@ import path from "node:path";
 
 import { describe, expect, it } from "vite-plus/test";
 
-import { createExtensionSmokeHarness } from "../../../../tests/harness/extension-smoke.js";
+import { createExtensionSmokeHarness } from "./support/extension-smoke.js";
 
 describe("claude-bridge package", () => {
   it("loads and registers the claude-bridge provider with pi-ai's Anthropic models", async () => {

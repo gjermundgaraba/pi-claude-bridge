@@ -4,13 +4,13 @@ import type { Message } from "@earendil-works/pi-ai";
 import { convertToLlm, SessionManager } from "@earendil-works/pi-coding-agent";
 import { afterEach, describe, expect, it } from "vite-plus/test";
 
-import { createTempDir } from "../../../../../tests/helpers/fs.js";
 import {
   historyDigest,
   latestRecord,
   SESSION_ENTRY,
 } from "../../session/warm.js";
 import type { SessionRecord } from "../../session/warm.js";
+import { createTempDir } from "../support/fs.js";
 import {
   assistant,
   image,

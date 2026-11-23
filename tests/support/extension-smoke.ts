@@ -1,0 +1,110 @@
+import { existsSync, mkdirSync, rmSync } from "node:fs";
+import path from "node:path";
+
+import { createAgentSessionHarness } from "./agent-session.js";
+import type {
+  ExtensionUIContext,
+  FauxModelDefinition,
+} from "./agent-session.js";
+import { patchEnv } from "./env.js";
+import { createTempDir, linkDirectory } from "./fs.js";
+
+interface ExtensionSmokeHarnessOptions {
+  extensions?: string[];
+  packages?: string[];
+  skillPaths?: string[];
+  uiContext?: ExtensionUIContext;
+  models?: FauxModelDefinition[];
+  withConfiguredAuth?: boolean;
+}
+
+const noopRestore = (): void => undefined;
+
+export const createExtensionSmokeHarness = async (
+  options: ExtensionSmokeHarnessOptions
+) => {
+  let projectDir: string | undefined;
+  let homeDir: string | undefined;
+  let restoreEnv = noopRestore;
+
+  let harness:
+    | Awaited<ReturnType<typeof createAgentSessionHarness>>
+    | undefined;
+
+  let cleanedUp = false;
+
+  const cleanup = () => {
+    if (cleanedUp) {
+      return;
+    }
+
+    cleanedUp = true;
+
+    try {
+      harness?.cleanup();
+    } finally {
+      harness = undefined;
+
+      try {
+        restoreEnv();
+      } finally {
+        if (projectDir !== undefined && existsSync(projectDir)) {
+          rmSync(projectDir, { force: true, recursive: true });
+        }
+
+        if (homeDir !== undefined && existsSync(homeDir)) {
+          rmSync(homeDir, { force: true, recursive: true });
+        }
+      }
+    }
+  };
+
+  try {
+    projectDir = await createTempDir("extension-smoke-project-");
+    homeDir = await createTempDir("extension-smoke-home-");
+    restoreEnv = patchEnv({ HOME: homeDir });
+
+    const extensionsDir = path.join(projectDir, ".pi", "extensions");
+    mkdirSync(extensionsDir, { recursive: true });
+
+    await Promise.all(
+      (options.extensions ?? []).map(async (extensionPath) => {
+        await linkDirectory(
+          extensionPath,
+          path.join(extensionsDir, path.basename(extensionPath))
+        );
+      })
+    );
+
+    harness = await createAgentSessionHarness({
+      cwd: projectDir,
+      ...(options.models === undefined ? {} : { models: options.models }),
+      ...(options.packages === undefined
+        ? {}
+        : { settings: { packages: options.packages } }),
+      ...(options.skillPaths === undefined
+        ? {}
+        : { skillPaths: options.skillPaths }),
+      ...(options.uiContext === undefined
+        ? {}
+        : { uiContext: options.uiContext }),
+      ...(options.withConfiguredAuth === undefined
+        ? {}
+        : { withConfiguredAuth: options.withConfiguredAuth }),
+    });
+
+    return {
+      ...harness,
+      cleanup,
+      homeDir,
+      projectDir,
+    };
+  } catch (error) {
+    cleanup();
+    throw error;
+  }
+};
+
+export type ExtensionSmokeHarness = Awaited<
+  ReturnType<typeof createExtensionSmokeHarness>
+>;

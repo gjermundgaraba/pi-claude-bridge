@@ -13,7 +13,6 @@ import {
   vi,
 } from "vite-plus/test";
 
-import { createTempDir } from "../../../../tests/helpers/fs.js";
 import { latestRecord } from "../session/warm.js";
 import {
   LIVE,
@@ -24,6 +23,7 @@ import {
   syncLines,
 } from "./live.js";
 import type { DebugLog, LiveSession } from "./live.js";
+import { createTempDir } from "./support/fs.js";
 
 const CRIMSON_PNG =
   "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAAKklEQVR4nGO4I2JDU8QwasGoBaMWjFowasGoBaMWjFowasGoBaMWDBULADahsD1ndvqVAAAAAElFTkSuQmCC";

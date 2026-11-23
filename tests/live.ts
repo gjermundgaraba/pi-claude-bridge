@@ -15,13 +15,13 @@ import type { Static } from "typebox";
 import { Value } from "typebox/value";
 import { expect } from "vite-plus/test";
 
-import { createAgentSessionHarness } from "../../../../tests/harness/agent-session.js";
+import claudeBridge from "../index.js";
+import { createAgentSessionHarness } from "./support/agent-session.js";
 import type {
   AgentSessionHarness,
   AgentSessionHarnessOptions,
-} from "../../../../tests/harness/agent-session.js";
-import { patchEnv } from "../../../../tests/helpers/env.js";
-import claudeBridge from "../index.js";
+} from "./support/agent-session.js";
+import { patchEnv } from "./support/env.js";
 
 export const LIVE = process.env["CLAUDE_BRIDGE_LIVE"] === "1";
 

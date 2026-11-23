@@ -7,10 +7,10 @@ import { createSession, openSession } from "cc-session-io";
 import type { Message as SessionMessage } from "cc-session-io";
 import { afterEach, beforeEach, describe, expect, it } from "vite-plus/test";
 
-import { patchEnv } from "../../../../../tests/helpers/env.js";
-import { createTempDir } from "../../../../../tests/helpers/fs.js";
 import { rebuildSession } from "../../session/rebuild.js";
 import { sessionContents } from "../fixtures/session.js";
+import { patchEnv } from "../support/env.js";
+import { createTempDir } from "../support/fs.js";
 import { assistant, text, user } from "./messages.js";
 
 const MODEL = "claude-haiku-5-5";

@@ -21,8 +21,6 @@ import {
   vi,
 } from "vite-plus/test";
 
-import { patchEnv } from "../../../../tests/helpers/env.js";
-import { createTempDir } from "../../../../tests/helpers/fs.js";
 import { recordStream } from "../child.js";
 import {
   bridgeProvider,
@@ -43,6 +41,8 @@ import {
 import { sessionContents } from "./fixtures/session.js";
 import { fakeQueryFunction, testModel, transcript } from "./helpers.js";
 import type { FakeQuery } from "./helpers.js";
+import { patchEnv } from "./support/env.js";
+import { createTempDir } from "./support/fs.js";
 
 const model = testModel();
 

@@ -11,8 +11,8 @@ import path from "node:path";
 import { getAgentDir } from "@earendil-works/pi-coding-agent";
 import { afterEach, beforeEach, describe, expect, it } from "vite-plus/test";
 
-import { patchEnv } from "../../../../tests/helpers/env.js";
 import { cliDebugOptions, debug, debugLogPath, errorMessage } from "../log.js";
+import { patchEnv } from "./support/env.js";
 
 let dir: string;
 

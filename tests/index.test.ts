@@ -1,9 +1,9 @@
 import { describe, expect, it, vi } from "vite-plus/test";
 
-import { createExtensionHost } from "../../../../tests/harness/extension-host.js";
 import { createClaudeBridge } from "../index.js";
 import { fakeQueryFunction, testModel, transcript } from "./helpers.js";
 import type { FakeQuery } from "./helpers.js";
+import { createExtensionHost } from "./support/extension-host.js";
 
 const SESSION_ID = "pi-session";
 

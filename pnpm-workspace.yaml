@@ -1,0 +1,32 @@
+saveExact: true
+peerDependencyRules:
+  allowAny:
+    - vite
+  allowedVersions:
+    vite: "*"
+allowBuilds:
+  "@google/genai": true
+  esbuild: true
+  protobufjs: true
+minimumReleaseAge: 1440
+minimumReleaseAgeExclude:
+  - vite-plus
+  - "@voidzero-dev/*"
+  - oxlint
+  - "@oxlint/*"
+  - oxlint-tsgolint
+  - "@oxlint-tsgolint/*"
+  - oxfmt
+  - "@oxfmt/*"
+  - tsrs
+  - "@tsrs/*"
+  - vitest
+  - "@vitest/*"
+  - "@clanker-stuff/*"
+  - effect
+  - "@effect/*"
+  # Pi publishes its packages in lockstep and package.json pins them exactly, so a bump is always deliberate.
+  - "@earendil-works/*"
+permissions:
+  ultracite:
+    skills: false
