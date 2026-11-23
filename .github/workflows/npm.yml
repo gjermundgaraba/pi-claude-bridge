@@ -23,5 +23,8 @@ jobs:
       - run: vp test
       - name: Check that the tag names the package version
         run: test "$(jq -r .version package.json)" = "${GITHUB_REF_NAME#v}"
+      - run: vp pack
+      - name: Check that the host entry runs without pi's session packages
+        run: "! grep -rE 'pi-coding-agent|pi-tui' dist"
       # prepublishOnly builds dist; npm trusted publishing authenticates through the id-token.
       - run: vp pm publish --no-git-checks

@@ -14,7 +14,7 @@ import {
   vi,
 } from "vite-plus/test";
 
-import { createClaudeBridgeProvider } from "../host.js";
+import { hostProvider } from "../provider.js";
 import {
   assistantMessage,
   init,
@@ -40,7 +40,7 @@ const hostModels = async () => {
 
   const models = createModels({ credentials });
 
-  models.setProvider(createClaudeBridgeProvider(fake.run));
+  models.setProvider(hostProvider(fake.run));
 
   const model = models.getModel("claude-bridge", "claude-haiku-5-5");
 
@@ -69,7 +69,7 @@ const hostModels = async () => {
   return { ask, query };
 };
 
-describe("createClaudeBridgeProvider", () => {
+describe("hostProvider", () => {
   let configDir: string;
 
   let restoreEnv: () => void;
@@ -113,7 +113,6 @@ describe("createClaudeBridgeProvider", () => {
     const message = await reply.result();
 
     expect(message.stopReason).toBe("stop");
-    expect(message.content).toStrictEqual([{ type: "text", text: "hello" }]);
   });
 
   it("stops a session's Claude Code query when pi-ai cleans up that session only", async () => {

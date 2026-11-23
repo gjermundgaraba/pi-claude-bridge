@@ -16,7 +16,7 @@ Run `/model` and pick a `claude-bridge/…` model; pi's tools, skills, and conte
 
 ## Use outside pi
 
-`@gjermundgaraba/pi-claude-bridge/host` exports `createClaudeBridgeProvider()` for pi-ai hosts such as a pi-durable Harness: register it with `Models.setProvider()`. It needs neither pi-coding-agent nor pi-tui.
+`@gjermundgaraba/pi-claude-bridge/host` exports `createClaudeBridgeProvider()` for pi-ai hosts such as a pi-durable Harness; see [other hosts](docs/behavior.md#other-hosts).
 
 ## Requirements
 
