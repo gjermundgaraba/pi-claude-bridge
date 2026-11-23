@@ -1,9 +1,9 @@
 import { appendFileSync, mkdirSync } from "node:fs";
+import { homedir } from "node:os";
 import path from "node:path";
 import { inspect } from "node:util";
 
 import type { Options } from "@anthropic-ai/claude-agent-sdk";
-import { getAgentDir } from "@earendil-works/pi-coding-agent";
 
 const EXTENSION_ID = "claude-bridge";
 
@@ -12,12 +12,20 @@ const moduleInstanceId = Math.random().toString(36).slice(2, 8);
 const isDebugEnabled = (): boolean =>
   process.env["CLAUDE_BRIDGE_DEBUG"] === "1";
 
+const agentDir = (): string => {
+  const override = process.env["PI_CODING_AGENT_DIR"];
+
+  return override !== undefined && override !== ""
+    ? override
+    : path.join(homedir(), ".pi", "agent");
+};
+
 export const debugLogPath = (): string => {
   const override = process.env["CLAUDE_BRIDGE_DEBUG_PATH"];
 
   return override !== undefined && override !== ""
     ? override
-    : path.join(getAgentDir(), "data", EXTENSION_ID, "logs", "debug.log");
+    : path.join(agentDir(), "data", EXTENSION_ID, "logs", "debug.log");
 };
 
 const formatInFull = (value: unknown): string =>

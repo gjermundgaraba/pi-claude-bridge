@@ -14,6 +14,7 @@ The repository uses Vite+ (`vp`). Run `vp install` after pulling. `vp check` for
 - Sanitize text from sessions, providers, or Claude Code with `safeText()` where it is rendered.
 - Never suggest upstreaming a change to Pi. If an extension cannot do something today, it cannot do it today.
 - Commits carry DCO sign-offs: commit with `git commit -s`.
+- `host.ts` is the `./host` entry for pi-ai hosts outside pi's session. Nothing it imports may load pi-coding-agent or pi-tui at runtime; CI checks the build. `vp pack` builds it to `dist/`, which the published package exports. Publishing happens on a `v*` tag (`.github/workflows/npm.yml`), after bumping `version`.
 
 ## Upstream Pi reference
 

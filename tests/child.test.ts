@@ -56,6 +56,27 @@ describe("childEnv", () => {
     expect(process.env["ANTHROPIC_API_KEY"]).toBe("sk-parent-key");
   });
 
+  it("hands a Claude account's access token to Claude Code as its OAuth login", () => {
+    restoreEnv = patchEnv({
+      ANTHROPIC_API_KEY: "sk-parent-key",
+      ANTHROPIC_AUTH_TOKEN: "parent-token",
+      CLAUDE_CODE_OAUTH_TOKEN: undefined,
+    });
+
+    const account = childEnv({ authToken: "sk-ant-oat01-account" });
+
+    const gateway = childEnv({
+      baseUrl: "http://127.0.0.1:8317",
+      authToken: "sk-ant-oat01-account",
+    });
+
+    expect(account["CLAUDE_CODE_OAUTH_TOKEN"]).toBe("sk-ant-oat01-account");
+    expect(account["ANTHROPIC_AUTH_TOKEN"]).toBeUndefined();
+    expect(account["ANTHROPIC_API_KEY"]).toBeUndefined();
+    expect(gateway["CLAUDE_CODE_OAUTH_TOKEN"]).toBeUndefined();
+    expect(gateway["ANTHROPIC_AUTH_TOKEN"]).toBe("sk-ant-oat01-account");
+  });
+
   it("preserves parent ANTHROPIC_API_KEY when no gateway authToken is given", () => {
     restoreEnv = patchEnv({
       ANTHROPIC_API_KEY: "sk-parent-key",

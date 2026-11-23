@@ -17,6 +17,7 @@ import type {
   SimpleStreamOptions,
   TranscriptContext,
 } from "@earendil-works/pi-ai";
+import { builtinProviders } from "@earendil-works/pi-ai/providers/all";
 import type {
   ExtensionContext,
   ToolInfo,
@@ -419,10 +420,17 @@ const bridgeAuth: ApiKeyAuth = {
       : { auth: {}, source: "Claude Code" },
 };
 
+const claudeAccountAuth = builtinProviders().find(
+  (provider) => provider.id === "anthropic"
+)?.auth.oauth;
+
 export const bridgeProvider = (deps: ProviderDeps): Provider =>
   createProvider({
     id: PROVIDER_ID,
-    auth: { apiKey: bridgeAuth },
+    auth: {
+      apiKey: bridgeAuth,
+      ...(claudeAccountAuth === undefined ? {} : { oauth: claudeAccountAuth }),
+    },
     models: catalogModels(),
     api: {
       stream: (model, transcript, options) =>
