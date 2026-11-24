@@ -34,6 +34,6 @@ jobs:
       - name: Check that the host entry runs without pi's session packages
         run: "! grep -rE 'pi-coding-agent|pi-tui' dist"
       - name: Check that the host entry starts without what only a Claude turn needs
-        run: node tests/host-startup.mjs
+        run: node tests/host-startup.ts
       - name: Check that the build left the tree clean
         run: git diff --exit-code

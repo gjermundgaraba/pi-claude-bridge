@@ -3,7 +3,7 @@ import { registerHooks } from "node:module";
 import manifest from "../package.json" with { type: "json" };
 
 const turnOnly = [...Object.keys(manifest.dependencies), "typebox"];
-const loaded = new Set();
+const loaded = new Set<string>();
 
 registerHooks({
   resolve(specifier, context, nextResolve) {
@@ -19,9 +19,7 @@ registerHooks({
   },
 });
 
-const { createClaudeBridgeProvider } = await import("../dist/host.mjs");
-
-createClaudeBridgeProvider();
+await import(new URL("../dist/host.mjs", import.meta.url).href);
 
 if (loaded.size > 0) {
   throw new Error(`the host entry loaded ${[...loaded].join(", ")} at startup`);
