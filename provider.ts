@@ -13,6 +13,7 @@ import type {
   Message,
   Model,
   Provider,
+  ProviderStreams,
   SimpleStreamOptions,
   TranscriptContext,
 } from "@earendil-works/pi-ai";
@@ -23,7 +24,6 @@ import type {
 import { waitFor } from "xstate";
 
 import { catalogProvider } from "./catalog-provider.js";
-import type { AnswerInto } from "./catalog-provider.js";
 import { childEnv } from "./child.js";
 import type { ChildGateway, QueryFunction } from "./child.js";
 import { cliDebugOptions, debug, errorMessage } from "./log.js";
@@ -362,16 +362,16 @@ const serve = async (request: Request): Promise<void> => {
   });
 };
 
-const answerInto = (
+export const streamClaudeCode = (
   deps: ProviderDeps,
   model: Model<Api>,
   transcript: TranscriptContext,
-  options: SimpleStreamOptions | undefined,
-  stream: AssistantMessageEventStream
-): void => {
+  options: SimpleStreamOptions | undefined
+): AssistantMessageEventStream => {
   const context = toBridgeContext(transcript);
   const served = resolveServedTools(context.tools, deps.piTools());
   const gateway = gatewayFor(model, options);
+  const stream = createAssistantMessageEventStream();
   let turn: Turn | undefined;
 
   const key = queryKey(
@@ -403,29 +403,26 @@ const answerInto = (
       }
     }
   );
-};
-
-export const streamClaudeCode = (
-  deps: ProviderDeps,
-  model: Model<Api>,
-  transcript: TranscriptContext,
-  options: SimpleStreamOptions | undefined
-): AssistantMessageEventStream => {
-  const stream = createAssistantMessageEventStream();
-
-  answerInto(deps, model, transcript, options, stream);
 
   return stream;
 };
 
+const claudeCodeStreams = (deps: ProviderDeps): ProviderStreams => {
+  const answer: ProviderStreams["streamSimple"] = (
+    model,
+    transcript,
+    options
+  ) => streamClaudeCode(deps, model, transcript, options);
+
+  return { stream: answer, streamSimple: answer };
+};
+
 export const bridgeProvider = (deps: ProviderDeps): Provider =>
-  catalogProvider((model, transcript, options) =>
-    streamClaudeCode(deps, model, transcript, options)
-  );
+  catalogProvider(claudeCodeStreams(deps));
 
 /** Answers turns for a host without pi's session: each pi session id keeps a Claude Code
  *  session until pi-ai's session cleanup names it. */
-export const hostTurns = (runQuery: QueryFunction): AnswerInto => {
+export const hostTurns = (runQuery: QueryFunction): ProviderStreams => {
   const sessions = new Sessions(runQuery, () => undefined);
 
   registerSessionResourceCleanup((sessionId) => {
@@ -436,11 +433,7 @@ export const hostTurns = (runQuery: QueryFunction): AnswerInto => {
     }
   });
 
-  const deps: ProviderDeps = { sessions, piTools: () => [] };
-
-  return (model, transcript, options, stream) => {
-    answerInto(deps, model, transcript, options, stream);
-  };
+  return claudeCodeStreams({ sessions, piTools: () => [] });
 };
 
 /** The warning each session gets when pi-ai's Anthropic catalog left the provider no models

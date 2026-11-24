@@ -29,6 +29,10 @@ import { createTempDir } from "./support/fs.js";
 
 const ACCESS = "sk-ant-oat01-member";
 
+const refuse = (): never => {
+  throw new Error("no such model");
+};
+
 const hostModels = async (
   load = async (run: QueryFunction) => hostTurns(run)
 ) => {
@@ -170,6 +174,20 @@ describe("the host provider", () => {
     await query(0);
 
     expect(loads()).toBe(2);
+  });
+
+  it("keeps the loaded turn code when a turn throws", async () => {
+    const { ask, loads } = await hostModels(async () => ({
+      stream: refuse,
+      streamSimple: refuse,
+    }));
+
+    const first = await ask("first").result();
+    const second = await ask("second").result();
+
+    expect(first.errorMessage).toBe("no such model");
+    expect(second.errorMessage).toBe("no such model");
+    expect(loads()).toBe(1);
   });
 
   it("stops a session's Claude Code query when pi-ai cleans up that session only", async () => {

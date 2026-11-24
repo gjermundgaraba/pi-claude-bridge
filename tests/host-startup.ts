@@ -1,16 +1,13 @@
 import { registerHooks } from "node:module";
 
-import manifest from "../package.json" with { type: "json" };
-
-const turnOnly = [...Object.keys(manifest.dependencies), "typebox"];
+const dist = new URL("../dist/", import.meta.url).href;
 const loaded = new Set<string>();
 
 registerHooks({
   resolve(specifier, context, nextResolve) {
     if (
-      turnOnly.some(
-        (name) => specifier === name || specifier.startsWith(`${name}/`)
-      )
+      context.parentURL?.startsWith(dist) === true &&
+      !/^(?:\.|node:|@earendil-works\/pi-ai(?:\/|$))/u.test(specifier)
     ) {
       loaded.add(specifier);
     }
@@ -19,8 +16,10 @@ registerHooks({
   },
 });
 
-await import(new URL("../dist/host.mjs", import.meta.url).href);
+await import(new URL("host.mjs", dist).href);
 
 if (loaded.size > 0) {
-  throw new Error(`the host entry loaded ${[...loaded].join(", ")} at startup`);
+  throw new Error(
+    `the host entry loaded ${[...loaded].join(", ")} at startup, which only pi-ai may be`
+  );
 }
