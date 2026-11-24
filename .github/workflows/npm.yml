@@ -26,5 +26,7 @@ jobs:
       - run: vp pack
       - name: Check that the host entry runs without pi's session packages
         run: "! grep -rE 'pi-coding-agent|pi-tui' dist"
+      - name: Check that the host entry starts without what only a Claude turn needs
+        run: node tests/host-startup.mjs
       # prepublishOnly builds dist; npm trusted publishing authenticates through the id-token.
       - run: vp pm publish --no-git-checks
