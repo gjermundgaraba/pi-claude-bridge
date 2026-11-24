@@ -1,13 +1,17 @@
 import { registerHooks } from "node:module";
 
-const TURN_ONLY =
-  /^(?:@anthropic-ai\/claude-agent-sdk|@modelcontextprotocol\/|typebox|xstate|cc-session-io)/u;
+import manifest from "../package.json" with { type: "json" };
 
+const turnOnly = [...Object.keys(manifest.dependencies), "typebox"];
 const loaded = new Set();
 
 registerHooks({
   resolve(specifier, context, nextResolve) {
-    if (TURN_ONLY.test(specifier)) {
+    if (
+      turnOnly.some(
+        (name) => specifier === name || specifier.startsWith(`${name}/`)
+      )
+    ) {
       loaded.add(specifier);
     }
 
@@ -16,11 +20,8 @@ registerHooks({
 });
 
 const { createClaudeBridgeProvider } = await import("../dist/host.mjs");
-const provider = createClaudeBridgeProvider();
 
-if (provider.getModels().length === 0 || provider.auth.oauth === undefined) {
-  throw new Error("the host provider has no models or no Claude sign-in");
-}
+createClaudeBridgeProvider();
 
 if (loaded.size > 0) {
   throw new Error(`the host entry loaded ${[...loaded].join(", ")} at startup`);

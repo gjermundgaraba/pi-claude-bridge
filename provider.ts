@@ -362,13 +362,13 @@ const serve = async (request: Request): Promise<void> => {
   });
 };
 
-export const streamClaudeCode = (
+const answerInto = (
   deps: ProviderDeps,
   model: Model<Api>,
   transcript: TranscriptContext,
   options: SimpleStreamOptions | undefined,
-  stream = createAssistantMessageEventStream()
-): AssistantMessageEventStream => {
+  stream: AssistantMessageEventStream
+): void => {
   const context = toBridgeContext(transcript);
   const served = resolveServedTools(context.tools, deps.piTools());
   const gateway = gatewayFor(model, options);
@@ -403,6 +403,17 @@ export const streamClaudeCode = (
       }
     }
   );
+};
+
+export const streamClaudeCode = (
+  deps: ProviderDeps,
+  model: Model<Api>,
+  transcript: TranscriptContext,
+  options: SimpleStreamOptions | undefined
+): AssistantMessageEventStream => {
+  const stream = createAssistantMessageEventStream();
+
+  answerInto(deps, model, transcript, options, stream);
 
   return stream;
 };
@@ -428,7 +439,7 @@ export const hostTurns = (runQuery: QueryFunction): AnswerInto => {
   const deps: ProviderDeps = { sessions, piTools: () => [] };
 
   return (model, transcript, options, stream) => {
-    streamClaudeCode(deps, model, transcript, options, stream);
+    answerInto(deps, model, transcript, options, stream);
   };
 };
 

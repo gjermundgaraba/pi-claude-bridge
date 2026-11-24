@@ -14,7 +14,7 @@ The repository uses Vite+ (`vp`). Run `vp install` after pulling. `vp check` for
 - Sanitize text from sessions, providers, or Claude Code with `safeText()` where it is rendered.
 - Never suggest upstreaming a change to Pi. If an extension cannot do something today, it cannot do it today.
 - Commits carry DCO sign-offs: commit with `git commit -s`.
-- Nothing `host.ts` imports may load pi-coding-agent or pi-tui at runtime; CI and the publish job check `vp pack`'s `dist/`. The entry also starts without the Claude Agent SDK, the MCP SDK, typebox, xstate and cc-session-io, which it loads when the first turn starts: `catalog-provider.ts` and what it imports stay free of them, and `node tests/host-startup.mjs` checks the built entry. Publishing happens on a `v*` tag (`.github/workflows/npm.yml`), after bumping `version`.
+- Nothing `host.ts` imports may load pi-coding-agent or pi-tui at runtime; CI and the publish job check `vp pack`'s `dist/`. The entry also starts without the package's `dependencies` and typebox, which it loads when the first turn starts: `catalog-provider.ts` and everything it imports stay free of them, and `node tests/host-startup.mjs` checks the built entry. Publishing happens on a `v*` tag (`.github/workflows/npm.yml`), after bumping `version`.
 
 ## Upstream Pi reference
 

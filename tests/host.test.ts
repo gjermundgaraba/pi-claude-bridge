@@ -149,6 +149,29 @@ describe("the host provider", () => {
     expect(message.errorMessage).toContain("claude-agent-sdk");
   });
 
+  it("loads the turn code again after a failed load", async () => {
+    let failing = true;
+
+    const { ask, query, loads } = await hostModels(async (run) => {
+      if (failing) {
+        failing = false;
+
+        throw new Error("EMFILE: too many open files");
+      }
+
+      return hostTurns(run);
+    });
+
+    const failed = await ask("first").result();
+
+    expect(failed.stopReason).toBe("error");
+
+    ask("second");
+    await query(0);
+
+    expect(loads()).toBe(2);
+  });
+
   it("stops a session's Claude Code query when pi-ai cleans up that session only", async () => {
     const { ask, query } = await hostModels();
 
