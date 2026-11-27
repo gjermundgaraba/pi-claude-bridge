@@ -197,18 +197,27 @@ describe("effortForReasoning", () => {
 
   it("falls back to the generic table for levels the map leaves unnamed", () => {
     const fable = mapped({ xhigh: "xhigh", max: "max" });
-    const unmapped = mapped(undefined);
 
     expect(effortForReasoning(fable, "high")).toBe("high");
-    expect(effortForReasoning(unmapped, "minimal")).toBe("low");
-    expect(effortForReasoning(unmapped, "xhigh")).toBe("max");
-    expect(effortForReasoning(unmapped, "max")).toBe("max");
+    expect(effortForReasoning(fable, "minimal")).toBe("low");
   });
 
-  it("sends no effort for an unsupported, unrecognized or absent level", () => {
-    const model = mapped({ minimal: null, xhigh: "turbo" });
+  it("clamps a level the model doesn't support to the nearest one it does", () => {
+    const built = find(
+      buildModels([testModel("claude-opus-5")]),
+      "claude-opus-5"
+    );
 
-    expect(effortForReasoning(model, "minimal")).toBeUndefined();
+    const unmapped = mapped(undefined);
+
+    expect(effortForReasoning(built, "minimal")).toBe("low");
+    expect(effortForReasoning(unmapped, "xhigh")).toBe("high");
+    expect(effortForReasoning(unmapped, "max")).toBe("high");
+  });
+
+  it("sends no effort for an unrecognized or absent level", () => {
+    const model = mapped({ xhigh: "turbo", max: "max" });
+
     expect(effortForReasoning(model, "xhigh")).toBeUndefined();
     expect(effortForReasoning(model, undefined)).toBeUndefined();
   });
