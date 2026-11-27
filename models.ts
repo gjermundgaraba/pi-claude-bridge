@@ -55,7 +55,9 @@ export const claudeCodeModelId = (
 /** pi-ai's Anthropic models projected onto pi's provider registration, newest
  *  generation first, with the context window Claude Code serves by default rather than
  *  the one pi-ai declares. Costs are pi-ai's Anthropic list prices, so subscription
- *  usage shows what it would cost on the API; `models.json` may override them per model. */
+ *  usage shows what it would cost on the API; `models.json` may override them per model.
+ *  `off` and `minimal` are unsupported: Claude Code has no way to turn thinking off, so at
+ *  `off` it would run at its own effort, and `minimal` would be the same low effort as `low`. */
 export const buildModels = (
   catalog: ReadonlyArray<Model<Api>>
 ): Array<Model<Api>> =>
@@ -93,9 +95,7 @@ export const buildModels = (
         ? ONE_M_CONTEXT
         : TWO_HUNDRED_K_CONTEXT,
       maxTokens: model.maxTokens,
-      ...(model.thinkingLevelMap === undefined
-        ? {}
-        : { thinkingLevelMap: model.thinkingLevelMap }),
+      thinkingLevelMap: { ...model.thinkingLevelMap, off: null, minimal: null },
       cost: model.cost,
     }));
 

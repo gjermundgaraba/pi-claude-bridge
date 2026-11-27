@@ -1,6 +1,6 @@
 {
   "name": "@gjermundgaraba/pi-claude-bridge",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Uses Claude Code with your Claude subscription as a Pi model provider.",
   "keywords": [
     "pi-package"
