@@ -1,4 +1,5 @@
 import type { Api, Model } from "@earendil-works/pi-ai";
+import { getSupportedThinkingLevels } from "@earendil-works/pi-ai/models";
 import { getBuiltinModels } from "@earendil-works/pi-ai/providers/all";
 import { describe, expect, it } from "vite-plus/test";
 
@@ -63,6 +64,7 @@ describe("buildModels", () => {
       input: ["text"],
       contextWindow: 200_000,
       maxTokens: 8000,
+      thinkingLevelMap: { off: null, minimal: null },
       cost: { input: 1, output: 1, cacheRead: 1, cacheWrite: 1 },
     });
   });
@@ -101,7 +103,7 @@ describe("buildModels", () => {
     ]);
   });
 
-  it("forwards pi-ai's thinkingLevelMap verbatim and fabricates none", () => {
+  it("keeps pi-ai's thinkingLevelMap and marks off and minimal unsupported", () => {
     const models = buildModels([
       {
         ...catalogEntry("claude-sonnet-5"),
@@ -110,13 +112,12 @@ describe("buildModels", () => {
       catalogEntry("claude-haiku-4-5"),
     ]);
 
-    expect(find(models, "claude-sonnet-5").thinkingLevelMap).toStrictEqual({
-      xhigh: "xhigh",
-      max: "max",
-    });
-    expect(find(models, "claude-haiku-4-5")).not.toHaveProperty(
-      "thinkingLevelMap"
-    );
+    expect(
+      getSupportedThinkingLevels(find(models, "claude-sonnet-5"))
+    ).toStrictEqual(["low", "medium", "high", "xhigh", "max"]);
+    expect(
+      getSupportedThinkingLevels(find(models, "claude-haiku-4-5"))
+    ).toStrictEqual(["low", "medium", "high"]);
   });
 });
 
