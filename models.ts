@@ -1,5 +1,6 @@
 import type { EffortLevel } from "@anthropic-ai/claude-agent-sdk";
 import type { Api, Model, ThinkingLevel } from "@earendil-works/pi-ai";
+import { clampThinkingLevel } from "@earendil-works/pi-ai/models";
 import { getBuiltinModels } from "@earendil-works/pi-ai/providers/all";
 
 import { PROVIDER_ID } from "./session/convert.js";
@@ -56,8 +57,8 @@ export const claudeCodeModelId = (
  *  generation first, with the context window Claude Code serves by default rather than
  *  the one pi-ai declares. Costs are pi-ai's Anthropic list prices, so subscription
  *  usage shows what it would cost on the API; `models.json` may override them per model.
- *  `off` and `minimal` are unsupported: Claude Code has no way to turn thinking off, so at
- *  `off` it would run at its own effort, and `minimal` would be the same low effort as `low`. */
+ *  `off` and `minimal` are unsupported: the bridge sends Claude Code no thinking setting at
+ *  `off`, so it would run at its own effort, and `minimal` would be the same low effort as `low`. */
 export const buildModels = (
   catalog: ReadonlyArray<Model<Api>>
 ): Array<Model<Api>> =>
@@ -119,10 +120,11 @@ const EFFORT_LEVELS: readonly EffortLevel[] = [
   "max",
 ];
 
-/** Pi's reasoning level as a Claude Code effort. The model's own thinkingLevelMap wins:
- *  pi-ai ships one for most Claude models, and a null entry marks the level unsupported,
- *  so no effort is sent and Claude Code's default applies. A map value is trusted only
- *  when it names an effort Claude Code accepts. */
+/** Pi's reasoning level as a Claude Code effort. Pi's harness passes the level as the host
+ *  asked for it, so it is first clamped to one the model supports, as pi-ai's own providers
+ *  do. The model's own thinkingLevelMap wins: pi-ai ships one for most Claude models. A map
+ *  value is trusted only when it names an effort Claude Code accepts; otherwise no effort is
+ *  sent and Claude Code's default applies. */
 export const effortForReasoning = (
   model: Model<Api>,
   reasoning: ThinkingLevel | undefined
@@ -131,11 +133,17 @@ export const effortForReasoning = (
     return undefined;
   }
 
-  const mapped = model.thinkingLevelMap?.[reasoning];
+  const level = clampThinkingLevel(model, reasoning);
 
-  if (mapped === undefined) {
-    return REASONING_TO_EFFORT[reasoning];
+  if (level === "off") {
+    return undefined;
   }
 
-  return EFFORT_LEVELS.find((level) => level === mapped);
+  const mapped = model.thinkingLevelMap?.[level];
+
+  if (mapped === undefined) {
+    return REASONING_TO_EFFORT[level];
+  }
+
+  return EFFORT_LEVELS.find((effort) => effort === mapped);
 };
